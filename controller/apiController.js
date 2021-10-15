@@ -48,18 +48,11 @@ const createNews = async(req, res) => {
             // Lanuching browser
             const browser = await puppeteer
                 .launch({
-                    headless: true,
+                    headless: false,
                     args: [
                         "--window-size=1920,1080",
-                        "--disable-gpu",
-                        "--disable-dev-shm-usage",
-                        "--disable-setuid-sandbox",
-                        "--no-first-run",
                         "--no-sandbox",
-                        "--no-zygote",
-                        "--deterministic-fetch",
-                        "--disable-features=IsolateOrigins",
-                        "--disable-site-isolation-trials",
+                        "--disable-setuid-sandbox",
                     ],
                     defaultViewport: null,
                 })
