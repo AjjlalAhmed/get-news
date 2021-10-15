@@ -63,6 +63,7 @@ const createNews = async(req, res) => {
                         work: "Incompelete",
                     });
                 });
+
             // Trying to fetch news data
             try {
                 const allNews = [];
@@ -73,6 +74,10 @@ const createNews = async(req, res) => {
                     const newsData = [];
                     // Opening new page
                     const page = await browser.newPage();
+                    await page.setUserAgent(
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+                    );
+                    await page.setViewport({ width: 960, height: 768 });
                     // Going to given URL
                     await page.goto(urlToFetchFrom[index].link, {
                         waitUntil: "networkidle2",
