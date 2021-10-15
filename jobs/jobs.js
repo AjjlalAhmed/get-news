@@ -3,7 +3,7 @@ const cron = require("node-cron");
 const axios = require("axios");
 const service = require("../service/apiService");
 // Calling job
-cron.schedule("*/1 * * * *", async() => {
+cron.schedule("*/2 * * * *", async() => {
     console.log("running a task every ten minute");
     try {
         // Fetching jobs data
