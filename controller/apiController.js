@@ -51,15 +51,8 @@ const createNews = async(req, res) => {
                     headless: false,
                     args: [
                         "--window-size=1920,1080",
-                        "--disable-gpu",
-                        "--disable-dev-shm-usage",
-                        "--disable-setuid-sandbox",
-                        "--no-first-run",
                         "--no-sandbox",
-                        "--no-zygote",
-                        "--deterministic-fetch",
-                        "--disable-features=IsolateOrigins",
-                        "--disable-site-isolation-trials",
+                        "--disable-setuid-sandbox",
                     ],
                     defaultViewport: null,
                 })
@@ -73,7 +66,6 @@ const createNews = async(req, res) => {
             try {
                 const allNews = [];
                 // Fetching news
-
                 //Using for loop to go to different urls
                 for (let index = 0; index < urlToFetchFrom.length; index++) {
                     // Job data array
