@@ -57,6 +57,7 @@ const createNews = async(req, res) => {
                     defaultViewport: null,
                 })
                 .catch(async(e) => {
+                    console.log(e);
                     res.send({
                         status: 204,
                         work: "Incompelete",
