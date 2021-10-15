@@ -51,8 +51,15 @@ const createNews = async(req, res) => {
                     headless: false,
                     args: [
                         "--window-size=1920,1080",
-                        "--no-sandbox",
+                        "--disable-gpu",
+                        "--disable-dev-shm-usage",
                         "--disable-setuid-sandbox",
+                        "--no-first-run",
+                        "--no-sandbox",
+                        "--no-zygote",
+                        "--deterministic-fetch",
+                        "--disable-features=IsolateOrigins",
+                        "--disable-site-isolation-trials",
                     ],
                     defaultViewport: null,
                 })
@@ -66,81 +73,68 @@ const createNews = async(req, res) => {
             try {
                 const allNews = [];
                 // Fetching news
-                await new Promise(async(resolve, reject) => {
-                    //Using for loop to go to different urls
-                    for (let index = 0; index < urlToFetchFrom.length; index++) {
-                        // Job data array
-                        const newsData = [];
-                        // Opening new page
-                        const page = await browser.newPage();
-                        // Going to given URL
-                        await page.goto(urlToFetchFrom[index].link, {
-                            waitUntil: "networkidle2",
-                        });
-                        // Wait for selector
-                        page.waitForSelector(".latest-head").then(async() => {
-                            // Extracting news link
-                            const newsLinks = await page.evaluate(() =>
-                                Array.from(
-                                    document.querySelectorAll(".latest-head"),
-                                    (element) => element.firstChild.href
-                                )
-                            );
-                            // Extracting headlines
-                            const headline = await page.evaluate(() =>
-                                Array.from(
-                                    document.querySelectorAll(".latest-head"),
-                                    (element) => element.firstChild.textContent
-                                )
-                            );
-                            // Extracting summary
-                            const summary = await page.evaluate(() =>
-                                Array.from(
-                                    document.querySelectorAll(".latest-summary"),
-                                    (element) => element.textContent
-                                )
-                            );
-                            // Putting all data into news data array
-                            await (async() => {
-                                for (let i = 0; i < newsLinks.length; i++) {
-                                    newsData.push({
-                                        category: urlToFetchFrom[index].category,
-                                        link: newsLinks[i],
-                                        headline: headline[i],
-                                        summary: summary[i],
-                                    });
-                                }
-                                // Closing page
-                                page.close();
-                                // Putting newsData allnews
-                                allNews.push(newsData);
-                                if (index == urlToFetchFrom.length - 1) {
-                                    page.close();
-                                    // Resolving the promise
-                                    resolve(newsData);
-                                }
-                            })();
-                        });
-                    }
-                }).catch((e) => {
-                    throw e;
-                });
-                // Sending news to client
-                await new Promise(async(resolve, reject) => {
-                    // // Closing browser
-                    await browser.close();
-                    // Resolving the promise
-                    resolve(
-                        res.send({
-                            status: 200,
-                            totalNews: allNews.length,
-                            news: allNews,
-                        })
-                    );
-                }).catch((e) => {
-                    throw e;
-                });
+
+                //Using for loop to go to different urls
+                for (let index = 0; index < urlToFetchFrom.length; index++) {
+                    // Job data array
+                    const newsData = [];
+                    // Opening new page
+                    const page = await browser.newPage();
+                    // Going to given URL
+                    await page.goto(urlToFetchFrom[index].link, {
+                        waitUntil: "networkidle2",
+                    });
+                    // Wait for selector
+                    page.waitForSelector(".latest-head").then(async() => {
+                        // Extracting news link
+                        const newsLinks = await page.evaluate(() =>
+                            Array.from(
+                                document.querySelectorAll(".latest-head"),
+                                (element) => element.firstChild.href
+                            )
+                        );
+                        // Extracting headlines
+                        const headline = await page.evaluate(() =>
+                            Array.from(
+                                document.querySelectorAll(".latest-head"),
+                                (element) => element.firstChild.textContent
+                            )
+                        );
+                        // Extracting summary
+                        const summary = await page.evaluate(() =>
+                            Array.from(
+                                document.querySelectorAll(".latest-summary"),
+                                (element) => element.textContent
+                            )
+                        );
+                        // Putting all data into news data array
+                        await (async() => {
+                            for (let i = 0; i < newsLinks.length; i++) {
+                                newsData.push({
+                                    category: urlToFetchFrom[index].category,
+                                    link: newsLinks[i],
+                                    headline: headline[i],
+                                    summary: summary[i],
+                                });
+                            }
+                            // Closing page
+                            page.close();
+                            // Putting newsData allnews
+                            allNews.push(newsData);
+                            if (index == urlToFetchFrom.length - 1) {
+                                // Resolving the promise
+                                await browser.close();
+                                res.send({
+                                    status: 200,
+                                    totalNews: allNews.length,
+                                    news: allNews,
+                                });
+                            }
+                        })();
+                    });
+                }
             } catch (e) {
+                console.log(e);
                 browser.close();
                 // Sending news to client
                 res.send({
